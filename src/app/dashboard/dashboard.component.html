@@ -1,0 +1,62 @@
+<div class="col-md-12">
+    <h1 align="center">Dashboard</h1>
+
+    <div class="col-md-12">
+      <ul *ngFor="let item of ItemsArray;let i = index;">
+            <li>{{item.departmentname}}</li>
+            <hr>
+            <li>{{item.Managername}}</li>
+            <ul *ngFor="let items of item.manager;">
+                <hr>
+            <li>no of Developer <b>{{items.developer}}</b> = Total {{items.developer*1000}}</li>
+            <li> no of tester <b>{{items.tester}}</b> = Total {{items.tester*500}}</li>
+            <li> no of manager <b>{{items.noofManager}}</b> = Total {{items.noofManager*300}}</li>
+            <li>Total =&ensp;<b>{{ items.developer*1000+items.tester*500+items.noofManager*300 }}</b></li>
+            <hr>   
+            </ul>
+        <hr>
+        <li>Total  = </li>
+        </ul>
+
+        <table>
+            <tr>
+                <td>Each Developer</td>
+                <td>$1,000</td>
+            </tr>
+            <tr>
+                <td>Each QA Tester</td>
+                <td>$500</td>
+            </tr>
+            <tr>
+                <td>Each Manager</td>
+                <td>$300</td>
+            </tr>
+        </table>
+        <!--<table class="table table-hover table-responsive">
+            <thead>
+                <th>Depart-name</th>
+                <th>ManagerName</th>
+                <th>
+                    <thead>
+                    <th>M |D | S</th>
+                </thead>
+                </th>
+            </thead>
+            <tbody *ngFor="let item of ItemsArray;let i = index;">
+                <tr>
+                    <td>{{item.departmentname}}</td>
+                    <td>{{item.Managername}}</td>
+                    <td *ngFor="let items of item.manager;">
+                        <tr>
+                        <td>{{items.developer}}</td>
+                        <td>{{items.tester}}</td>
+                        <td>{{items.noofManager}}</td>
+                        </tr>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>-->
+    </div>
+
+</div>

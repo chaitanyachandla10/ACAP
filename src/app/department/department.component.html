@@ -1,0 +1,82 @@
+<div class="col-md-12" align="center">
+<form [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
+    <div class="card m-3">
+        <h5 class="card-header">Create Department</h5>
+        <div class="card-body border-bottom">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department Name</label>
+                    <input type="text" formControlName="departmentname" style="box-shadow: 1px 1px 5px blue;color:black;" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.departmentname.errors }" required/>
+                    <div *ngIf="submitted && f.departmentname.errors" class="invalid-feedback">
+                        <div *ngIf="f.departmentname.errors.required">departmentname is required</div>
+                    </div>
+                  </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Manager Name</label>
+                    <input type="text" formControlName="managername" style="box-shadow: 1px 1px 5px blue;color:black;" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.managername.errors }" required/>
+                    <div *ngIf="submitted && f.managername.errors" class="invalid-feedback">
+                        <div *ngIf="f.managername.errors.required">manager is required</div>
+                    </div>
+                  </div>
+            </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Add manager</label>
+                        <select formControlName="numberOfManager" class="form-control" (change)="onChangeTickets($event)" [ngClass]="{ 'is-invalid': submitted && f.numberOfTickets.errors }">
+                            <option value=""></option>
+                            <option *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">{{i}}</option>
+                        </select>
+                        <div *ngIf="submitted && f.numberOfManager.errors" class="invalid-feedback">
+                            <div *ngIf="f.numberOfManager.errors.required">Number of manager is required</div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div *ngFor="let manager of t.controls; let i = index" class="list-group list-group-flush">
+            <div class="list-group-item">
+                <h5 class="card-title">manager {{i + 1}}</h5>
+                <div [formGroup]="manager" class="form-row">
+                    <div class="form-group col-4">
+                        <label>Add manager</label>
+                        <select formControlName="noofManager" class="form-control"  [ngClass]="{ 'is-invalid': submitted && f.noofManager.errors }">
+                            <option value=""></option>
+                            <option *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">{{i}}</option>
+                        </select>
+                        <div *ngIf="submitted && f.noofManager.errors" class="invalid-feedback">
+                            <div *ngIf="f.noofManager.errors.required">Number of manager is required</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label>Developer</label>
+                        <select formControlName="developer" class="form-control"  [ngClass]="{ 'is-invalid': submitted && f.developer.errors }">
+                            <option value=""></option>
+                            <option *ngFor="let j of [1,2,3,4,5,6,7,8,9,10]">{{j}}</option>
+                        </select>
+                        <div *ngIf="submitted && f.developer.errors" class="invalid-feedback">
+                            <div *ngIf="f.developer.errors.required">Number of Developer is required</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label>QA Tester</label>
+                        <select formControlName="tester" class="form-control"  [ngClass]="{ 'is-invalid': submitted && f.tester.errors }">
+                            <option value=""></option>
+                            <option *ngFor="let k of [1,2,3,4,5,6,7,8,9,10]">{{k}}</option>
+                        </select>
+                        <div *ngIf="submitted && f.tester.errors" class="invalid-feedback">
+                            <div *ngIf="f.tester.errors.required">Number of Tester is required</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center border-top-0">
+            <button class="btn btn-primary mr-1">SUbmit</button>
+            <button class="btn btn-secondary mr-1" type="reset" (click)="onReset()">Reset</button>
+            <button class="btn btn-secondary" type="button" (click)="onClear()">Clear</button>
+        </div>
+    </div>
+</form>
+</div>

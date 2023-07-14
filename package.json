@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "~9.1.6",
     "@angular/router": "~9.1.6",
     "express": "^4.17.1",
-    "mongoose": "^5.9.20",
+    "mongoose": "^5.13.15",
     "nodemon": "^2.0.4",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",

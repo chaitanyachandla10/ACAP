@@ -1,33 +1,17 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const task = require('./models/acap');
+const {
+  initializeDatabase,
+  createDepartment,
+  getDepartments
+} = require('./db');
 const app = express();
 
+initializeDatabase()
+  .then(() => console.log('Connected to PostgreSQL'))
+  .catch((err) => console.error('PostgreSQL initialization error', err));
 
-const mongoose = require('mongoose'); 
-
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  autoIndex: false, // Don't build indexes
-  poolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4, // Use IPv4, skip trying IPv6
-};
-
- mongoose.connect('mongodb://localhost:27017/acap', options)
-.then(() => console.log("Connected to Database"))
-    .catch(err => console.error("An error has occured", err));
-
-    
-
-
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -42,39 +26,45 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/datasend", (req, res, next) => {
-  const post = req.body;
-  console.log("===1==",req.body.numberOfManager.length);
+app.post("/datasend", async (req, res) => {
+  try {
+    const departmentname = String(req.body.departmentname || '').trim();
+    const managername = String(req.body.Managername ?? req.body.managername ?? '').trim();
 
-  const tasksave = new task({
-    departmentname:req.body.departmentname,
-    Managername:req.body.managername,
-    manager:req.body.manager
-  })
-  console.log(tasksave);
+    if (!departmentname || !managername) {
+      return res.status(400).json({
+        message: 'Department name and manager name are required'
+      });
+    }
 
-  /* */
-   tasksave.save(function (err, data) {
-    if (err) return console.error(err);
-    console.log("here is data saved",data);
-  });
-    res.status(201).json({
-      message: 'Post added successfully'
+    const department = await createDepartment({
+      departmentname,
+      managername,
+      manager: req.body.manager
     });
 
+    res.status(201).json({
+      message: 'Department saved successfully',
+      department
+    });
+  } catch (error) {
+    console.error('Failed to save department', error);
+    res.status(500).json({
+      message: 'Unable to save department'
+    });
+  }
 });
 
-app.get("/getdata", (req, res, next) => {
-
-  task.find({},function (err, data) {
-    if (err) return console.error(err);
-    console.log(data);
-    res.send(data);
-    //res.status(200).json({
-    //  task: data
-    //});
-  })
-
+app.get("/getdata", async (req, res) => {
+  try {
+    const departments = await getDepartments();
+    res.status(200).json(departments);
+  } catch (error) {
+    console.error('Failed to fetch departments', error);
+    res.status(500).json({
+      message: 'Unable to fetch department data'
+    });
+  }
 });
 
 module.exports = app;

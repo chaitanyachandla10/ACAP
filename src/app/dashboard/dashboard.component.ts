@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder,FormGroup, FormGroupDirective, FormArray, Validators} from '@angular/forms';
-import { AcapService } from '../acap.service';
+import { forkJoin } from 'rxjs';
+import { AcapService, DepartmentRecord, ManagerAllocation } from '../acap.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,39 +8,37 @@ import { AcapService } from '../acap.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  records: DepartmentRecord[] = [];
+  errorMessage = '';
+  departmentsCount = 0;
+  employeesCount = 0;
+  managersCount = 0;
 
-  ItemsArray:any;
-  total:any;
-  constructor(private formBuilder: FormBuilder,private acapservice: AcapService) { }
+  constructor(private acapservice: AcapService) { }
 
   ngOnInit(): void {
-     
-    this.acapservice.getPeople().subscribe((data: any[])=>{
-      console.log(data);
-      //console.log(Array.of(data));
-      //this.ItemsArray = Array.of(data);
-      this.ItemsArray = data;
-      console.log(this.ItemsArray.manager.length);
-      for(var j=0; j>=data.length; j++)
-      {
-        console.log("-----j-----",j);
-        for(var i=0; i>=data[j].manager.length; i++)
-        {
-          var deveploertotal,testertotal,managertotal;
-          var sum;
-          deveploertotal = this.ItemsArray.manager[i].developer*1000;
-          testertotal = this.ItemsArray.manager[i].tester*500;
-          managertotal = this.ItemsArray.manager[i].noofManager*300;
-          sum = deveploertotal + testertotal + managertotal;
-          alert(sum);
-          console.log(sum);
-          this.total +=sum;
-          alert(this.total);
-          console.log(this.total);
-        }
+    forkJoin({
+      departments: this.acapservice.getDepartments(),
+      employees: this.acapservice.getEmployees(),
+      managers: this.acapservice.getManagers()
+    }).subscribe({
+      next: ({ departments, employees, managers }) => {
+        this.records = departments;
+        this.departmentsCount = departments.length;
+        this.employeesCount = employees.length;
+        this.managersCount = managers.length;
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load dashboard data.';
       }
-    })
+    });
+  }
 
-    }
+  getAllocationTotal(allocation: ManagerAllocation): number {
+    return (allocation.developer * 1000) + (allocation.tester * 500) + (allocation.noofManager * 300);
+  }
 
+  getDepartmentTotal(record: DepartmentRecord): number {
+    return record.manager.reduce((total, allocation) => total + this.getAllocationTotal(allocation), 0);
+  }
 }

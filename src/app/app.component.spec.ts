@@ -1,15 +1,23 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { DepartmentComponent } from './department/department.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { AppComponent } from './app.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        ReactiveFormsModule,
+        HttpClientTestingModule
       ],
       declarations: [
-        AppComponent
+        AppComponent,
+        DepartmentComponent,
+        DashboardComponent
       ],
     }).compileComponents();
   }));
@@ -26,10 +34,11 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('ACAP');
   });
 
-  it('should render title', () => {
+  it('should render the department and dashboard sections', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('ACAP app is running!');
+    expect(compiled.textContent).toContain('Create Department');
+    expect(compiled.textContent).toContain('Dashboard');
   });
 });

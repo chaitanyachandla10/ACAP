@@ -1,7 +1,14 @@
-<div class="container">
-<div class="col-md-12">
-   <app-department></app-department>
-<app-dashboard></app-dashboard>
-
-</div>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">ACAP Employee Management</div>
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/employees" routerLinkActive="active">Employees</a>
+      <a routerLink="/departments" routerLinkActive="active">Departments</a>
+      <a routerLink="/managers" routerLinkActive="active">Managers</a>
+    </nav>
+  </header>
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
 </div>

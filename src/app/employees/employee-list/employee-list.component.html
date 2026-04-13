@@ -1,0 +1,31 @@
+<div class="container py-4">
+  <h2>Employee Service</h2>
+  <p>Employee listings are lazy-loaded and rendered using OnPush change detection.</p>
+
+  <div class="card p-3 mb-3" *ngIf="employees$ | async as employees; else loading">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Title</th>
+          <th>Department</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of employees; trackBy: trackByEmployee">
+          <td>{{ employee.id }}</td>
+          <td>{{ employee.name }}</td>
+          <td>{{ employee.title }}</td>
+          <td>{{ employee.department }}</td>
+          <td>{{ employee.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #loading>
+    <div class="alert alert-info">Loading employees...</div>
+  </ng-template>
+</div>

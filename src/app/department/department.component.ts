@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder,FormGroup, FormGroupDirective, FormArray, Validators} from '@angular/forms';
-import { AcapService } from '../acap.service';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AcapService, DepartmentRecord } from '../acap.service';
 
 @Component({
   selector: 'app-department',
@@ -8,65 +8,84 @@ import { AcapService } from '../acap.service';
   styleUrls: ['./department.component.css']
 })
 export class DepartmentComponent implements OnInit {
-  
-  departmentForm: FormGroup;
+  departmentForm!: FormGroup;
   submitted = false;
+  submitMessage = '';
 
-  constructor(private formBuilder: FormBuilder,private acapservice: AcapService) { }
+  constructor(private formBuilder: FormBuilder, private acapservice: AcapService) { }
 
   ngOnInit(): void {
-        this.departmentForm = this.formBuilder.group({
-          departmentname:['', Validators.required],
-          managername:['', Validators.required],
-          numberOfManager: ['', Validators.required],
-          manager: new FormArray([])
-        });
+    this.departmentForm = this.formBuilder.group({
+      departmentname: ['', Validators.required],
+      managername: ['', Validators.required],
+      numberOfManager: ['', Validators.required],
+      manager: this.formBuilder.array([])
+    });
+  }
+
+  get f() {
+    return this.departmentForm.controls;
+  }
+
+  get t(): FormArray {
+    return this.f['manager'] as FormArray;
+  }
+
+  onChangeTickets(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const numberOfManager = Number(target.value) || 0;
+
+    while (this.t.length < numberOfManager) {
+      this.t.push(this.formBuilder.group({
+        noofManager: ['', Validators.required],
+        developer: ['', Validators.required],
+        tester: ['', Validators.required]
+      }));
+    }
+
+    while (this.t.length > numberOfManager) {
+      this.t.removeAt(this.t.length - 1);
+    }
+  }
+
+  onSubmit(): void {
+    this.submitted = true;
+    this.submitMessage = '';
+
+    if (this.departmentForm.invalid) {
+      this.departmentForm.markAllAsTouched();
+      return;
+    }
+
+    const payload: DepartmentRecord = {
+      departmentname: this.departmentForm.value.departmentname,
+      Managername: this.departmentForm.value.managername,
+      manager: this.departmentForm.value.manager.map((allocation: { noofManager: string; developer: string; tester: string; }) => ({
+        noofManager: Number(allocation.noofManager),
+        developer: Number(allocation.developer),
+        tester: Number(allocation.tester)
+      }))
+    };
+
+    this.acapservice.addDepartment(payload).subscribe({
+      next: () => {
+        this.submitMessage = 'Department saved successfully.';
+        this.onReset();
+      },
+      error: () => {
+        this.submitMessage = 'Unable to save the department.';
       }
-
-          // convenience getters for easy access to form fields
-    get f() { return this.departmentForm.controls; }
-    get t() { return this.f.manager as FormArray; }
-    onChangeTickets(e) {
-      const numberOfManager = e.target.value || 0;
-      if (this.t.length < numberOfManager) {
-          for (let i = this.t.length; i < numberOfManager; i++) {
-              this.t.push(this.formBuilder.group({
-                noofManager: ['', Validators.required],
-                developer: ['', Validators.required],
-                tester: ['', [Validators.required]]
-              }));
-          }
-      } else {
-          for (let i = this.t.length; i >= numberOfManager; i--) {
-              this.t.removeAt(i);
-          }
-      }
+    });
   }
 
-    onSubmit() {
-      this.submitted = true;
-
-      // stop here if form is invalid
-      if (this.departmentForm.invalid) {
-          return;
-      }
-
-      // display form values on success
-      alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.departmentForm.value, null, 4));
-      this.acapservice.addPerson(this.departmentForm.value)
+  onReset(): void {
+    this.submitted = false;
+    this.departmentForm.reset();
+    this.t.clear();
   }
 
-    onReset() {
-      // reset whole form back to initial state
-      this.submitted = false;
-      this.departmentForm.reset();
-      this.t.clear();
+  onClear(): void {
+    this.submitted = false;
+    this.t.clear();
   }
-
-  onClear() {
-      // clear errors and reset ticket fields
-      this.submitted = false;
-      this.t.reset();
-  }
-
 }

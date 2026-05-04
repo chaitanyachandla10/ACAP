@@ -18,7 +18,7 @@
     "@angular/forms": "^17.3.12",
     "@angular/platform-browser": "^17.3.12",
     "@angular/platform-browser-dynamic": "^17.3.12",
-    "@angular/router": "^17.3.12",
+    "@angular/router": "^21.2.11",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-rate-limit": "^6.11.2",

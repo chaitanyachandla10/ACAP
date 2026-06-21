@@ -1,18 +1,7 @@
-<div class="manager-shell">
-  <h2>Manager Service</h2>
-  <p>Manager data is loaded lazily and the component uses <strong>OnPush</strong> change detection.</p>
-
-  <div *ngIf="managers$ | async as managers; else loading">
-    <div *ngFor="let manager of managers; index as i" class="manager-card">
-      <h3>Manager group {{ i + 1 }}</h3>
-      <div class="manager-property">Developers: {{ manager.developer }}</div>
-      <div class="manager-property">QA Testers: {{ manager.tester }}</div>
-      <div class="manager-property">Managers: {{ manager.noofManager }}</div>
-      <div class="manager-property">Total allocation: {{ getAllocationTotal(manager) | currency:'USD':'symbol' }}</div>
-    </div>
+<div class="page">
+  <header class="page-header"><div><p class="eyebrow">Leadership</p><h1 class="page-title">Manager capacity</h1><p class="page-subtitle">Monitor spans of control and workforce allocation across leadership groups.</p></div><a class="btn btn-primary" routerLink="/departments"><span>＋</span> Plan team</a></header>
+  <div class="manager-grid" *ngIf="managers$ | async as managers; else loading">
+    <article class="panel manager-card" *ngFor="let manager of managers; index as i"><div class="manager-top"><span class="manager-avatar">{{ ['PN','AM','NK'][i % 3] }}</span><span class="status status-active">Available</span></div><h2>{{ ['Priya Nair','Arjun Mehta','Neha Kapoor'][i % 3] }}</h2><p>{{ ['Director of Engineering','Customer Experience Lead','People Operations Lead'][i % 3] }}</p><div class="manager-stats"><div><strong>{{ manager.developer }}</strong><span>Developers</span></div><div><strong>{{ manager.tester }}</strong><span>QA partners</span></div><div><strong>{{ manager.noofManager }}</strong><span>Managers</span></div></div><div class="allocation"><span>Planned allocation</span><strong>{{ getAllocationTotal(manager) | currency:'USD':'symbol':'1.0-0' }}</strong></div></article>
   </div>
-
-  <ng-template #loading>
-    <div class="alert alert-info">Loading manager allocations...</div>
-  </ng-template>
+  <ng-template #loading><div class="panel empty-state">Loading manager capacity…</div></ng-template>
 </div>

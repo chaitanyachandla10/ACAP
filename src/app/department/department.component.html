@@ -1,75 +1,20 @@
-<div class="col-md-12" align="center">
-<form [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
-    <div class="card m-3">
-        <h5 class="card-header">Create Department</h5>
-        <p *ngIf="submitMessage">{{ submitMessage }}</p>
-        <div class="card-body border-bottom">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Department Name</label>
-                    <input type="text" formControlName="departmentname" style="box-shadow: 1px 1px 5px blue;color:black;" class="form-control" [ngClass]="{ 'is-invalid': submitted && f['departmentname'].errors }" required/>
-                    <div *ngIf="submitted && f['departmentname'].errors" class="invalid-feedback">
-                        <div *ngIf="f['departmentname'].errors?.['required']">Department name is required</div>
-                    </div>
-                  </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Manager Name</label>
-                    <input type="text" formControlName="managername" style="box-shadow: 1px 1px 5px blue;color:black;" class="form-control" [ngClass]="{ 'is-invalid': submitted && f['managername'].errors }" required/>
-                    <div *ngIf="submitted && f['managername'].errors" class="invalid-feedback">
-                        <div *ngIf="f['managername'].errors?.['required']">Manager name is required</div>
-                    </div>
-                  </div>
-            </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Add manager</label>
-                        <select formControlName="numberOfManager" class="form-control" (change)="onChangeTickets($event)" [ngClass]="{ 'is-invalid': submitted && f['numberOfManager'].errors }">
-                            <option value=""></option>
-                            <option *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">{{i}}</option>
-                        </select>
-                        <div *ngIf="submitted && f['numberOfManager'].errors" class="invalid-feedback">
-                            <div *ngIf="f['numberOfManager'].errors?.['required']">Number of managers is required</div>
-                        </div>
-                    </div>
-            </div>
-        </div>
-        <div formArrayName="manager">
-            <div *ngFor="let manager of t.controls; let i = index" class="list-group list-group-flush">
-                <div class="list-group-item">
-                    <h5 class="card-title">manager {{i + 1}}</h5>
-                    <div [formGroupName]="i" class="form-row">
-                        <div class="form-group col-4">
-                            <label>Add manager</label>
-                            <select formControlName="noofManager" class="form-control">
-                                <option value=""></option>
-                                <option *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">{{i}}</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-4">
-                            <label>Developer</label>
-                            <select formControlName="developer" class="form-control">
-                                <option value=""></option>
-                                <option *ngFor="let j of [1,2,3,4,5,6,7,8,9,10]">{{j}}</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-4">
-                            <label>QA Tester</label>
-                            <select formControlName="tester" class="form-control">
-                                <option value=""></option>
-                                <option *ngFor="let k of [1,2,3,4,5,6,7,8,9,10]">{{k}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer text-center border-top-0">
-            <button class="btn btn-primary mr-1">Submit</button>
-            <button class="btn btn-secondary mr-1" type="reset" (click)="onReset()">Reset</button>
-            <button class="btn btn-secondary" type="button" (click)="onClear()">Clear</button>
-        </div>
-    </div>
-</form>
+<div class="page">
+  <header class="page-header"><div><p class="eyebrow">Organisation design</p><h1 class="page-title">Create a department</h1><p class="page-subtitle">Set up a business unit, assign leadership and define the team capacity plan.</p></div><a class="btn btn-secondary" routerLink="/dashboard">← Back to overview</a></header>
+  <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="form-layout">
+    <section class="panel form-panel">
+      <div class="section-heading"><span>01</span><div><h2>Department details</h2><p>Basic information about this business unit.</p></div></div>
+      <div *ngIf="submitMessage" class="form-alert" [class.success]="submitStatus === 'success'" [class.error]="submitStatus === 'error'">{{ submitMessage }}</div>
+      <div class="form-grid">
+        <label><span class="field-label">Department name</span><input class="field-control" formControlName="departmentname" placeholder="e.g. Product & Engineering" [class.invalid]="submitted && f['departmentname'].invalid"><small *ngIf="submitted && f['departmentname'].invalid" class="field-error">Enter a valid department name.</small></label>
+        <label><span class="field-label">Department lead</span><input class="field-control" formControlName="managername" placeholder="e.g. Priya Nair" [class.invalid]="submitted && f['managername'].invalid"><small *ngIf="submitted && f['managername'].invalid" class="field-error">Enter the department lead.</small></label>
+        <label><span class="field-label">Leadership groups</span><select class="field-control" formControlName="numberOfManager" (change)="onChangeTickets($event)" [class.invalid]="submitted && f['numberOfManager'].invalid"><option value="">Select a number</option><option *ngFor="let i of [1,2,3,4,5,6]" [value]="i">{{ i }} group{{ i > 1 ? 's' : '' }}</option></select><small *ngIf="submitted && f['numberOfManager'].invalid" class="field-error">Select at least one group.</small></label>
+      </div>
+      <div class="section-heading allocation-heading" *ngIf="t.length"><span>02</span><div><h2>Capacity allocation</h2><p>Plan the composition of each leadership group.</p></div></div>
+      <div formArrayName="manager" class="allocation-list">
+        <article *ngFor="let manager of t.controls; let i = index" [formGroupName]="i" class="allocation-card"><div class="allocation-title"><strong>Leadership group {{ i + 1 }}</strong><span>Monthly capacity</span></div><div class="allocation-grid"><label><span class="field-label">Managers</span><input class="field-control" min="1" max="20" type="number" formControlName="noofManager" placeholder="1"></label><label><span class="field-label">Developers</span><input class="field-control" min="0" max="100" type="number" formControlName="developer" placeholder="8"></label><label><span class="field-label">QA specialists</span><input class="field-control" min="0" max="100" type="number" formControlName="tester" placeholder="3"></label></div></article>
+      </div>
+      <div class="form-actions"><button class="btn btn-secondary" type="button" (click)="onReset()">Reset form</button><button class="btn btn-primary" type="submit">Create department →</button></div>
+    </section>
+    <aside class="panel guidance"><div class="guidance-icon">✦</div><h2>Planning guidance</h2><p>A balanced team improves delivery velocity and keeps management overhead predictable.</p><ul><li><strong>6–10</strong><span>recommended direct reports per manager</span></li><li><strong>1 : 3</strong><span>QA to developer ratio for product teams</span></li><li><strong>Quarterly</strong><span>review allocation and team health</span></li></ul><div class="tip">Tip: Start with one leadership group. You can expand capacity as the department grows.</div></aside>
+  </form>
 </div>

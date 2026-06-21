@@ -56,18 +56,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ACAP:build"
+            "buildTarget": "ACAP:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ACAP:build:production"
+              "buildTarget": "ACAP:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ACAP:build"
+            "buildTarget": "ACAP:build"
           }
         },
         "test": {
@@ -90,7 +90,6 @@
       }
     }
   },
-  "defaultProject": "ACAP",
   "cli": {
     "analytics": false
   }

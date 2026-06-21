@@ -4,6 +4,7 @@ import { AcapService, ManagerAllocation } from '../acap.service';
 
 @Component({
   selector: 'app-manager',
+  standalone: false,
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -4,6 +4,7 @@ import { AcapService, DepartmentRecord } from '../acap.service';
 
 @Component({
   selector: 'app-department',
+  standalone: false,
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css']
 })
@@ -11,13 +12,14 @@ export class DepartmentComponent implements OnInit {
   departmentForm!: FormGroup;
   submitted = false;
   submitMessage = '';
+  submitStatus: 'success' | 'error' | '' = '';
 
   constructor(private formBuilder: FormBuilder, private acapservice: AcapService) { }
 
   ngOnInit(): void {
     this.departmentForm = this.formBuilder.group({
-      departmentname: ['', Validators.required],
-      managername: ['', Validators.required],
+      departmentname: ['', [Validators.required, Validators.minLength(2)]],
+      managername: ['', [Validators.required, Validators.minLength(2)]],
       numberOfManager: ['', Validators.required],
       manager: this.formBuilder.array([])
     });
@@ -51,6 +53,7 @@ export class DepartmentComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
     this.submitMessage = '';
+    this.submitStatus = '';
 
     if (this.departmentForm.invalid) {
       this.departmentForm.markAllAsTouched();
@@ -70,10 +73,12 @@ export class DepartmentComponent implements OnInit {
     this.acapservice.addDepartment(payload).subscribe({
       next: () => {
         this.submitMessage = 'Department saved successfully.';
+        this.submitStatus = 'success';
         this.onReset();
       },
       error: () => {
-        this.submitMessage = 'Unable to save the department.';
+        this.submitMessage = 'Unable to save the department. Check that the API and database are available.';
+        this.submitStatus = 'error';
       }
     });
   }

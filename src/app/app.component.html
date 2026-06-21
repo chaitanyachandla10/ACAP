@@ -1,14 +1,49 @@
 <div class="app-shell">
-  <header class="topbar">
-    <div class="brand">ACAP Employee Management</div>
+  <aside class="sidebar" [class.open]="menuOpen" aria-label="Primary navigation">
+    <div class="brand-row">
+      <div class="brand-mark" aria-hidden="true">A</div>
+      <div><strong>ACAP</strong><span>Workforce OS</span></div>
+      <button class="close-menu" type="button" (click)="closeMenu()" aria-label="Close navigation">×</button>
+    </div>
+
     <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/employees" routerLinkActive="active">Employees</a>
-      <a routerLink="/departments" routerLinkActive="active">Departments</a>
-      <a routerLink="/managers" routerLinkActive="active">Managers</a>
+      <p class="nav-label">Workspace</p>
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">
+        <span class="nav-icon">⌂</span> Overview
+      </a>
+      <a routerLink="/employees" routerLinkActive="active" (click)="closeMenu()">
+        <span class="nav-icon">◎</span> People
+      </a>
+      <a routerLink="/departments" routerLinkActive="active" (click)="closeMenu()">
+        <span class="nav-icon">◇</span> Departments
+      </a>
+      <a routerLink="/managers" routerLinkActive="active" (click)="closeMenu()">
+        <span class="nav-icon">☆</span> Managers
+      </a>
     </nav>
-  </header>
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
+
+    <div class="sidebar-footer">
+      <div class="help-card">
+        <span class="help-icon">?</span>
+        <strong>Need help?</strong>
+        <p>Read the API docs or setup guide.</p>
+        <a href="http://localhost:3000/api-docs/v1" target="_blank" rel="noopener">Open documentation →</a>
+      </div>
+      <div class="profile">
+        <div class="avatar">CC</div>
+        <div><strong>Chaitanya</strong><span>Administrator</span></div>
+        <span class="profile-more">•••</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <button class="menu-button" type="button" (click)="menuOpen = true" aria-label="Open navigation">☰</button>
+      <div class="search"><span>⌕</span><input type="search" aria-label="Search" placeholder="Search people, teams or reports"></div>
+      <div class="top-actions"><button aria-label="Notifications">♢<span class="notification-dot"></span></button><div class="top-avatar">CC</div></div>
+    </header>
+    <main class="content"><router-outlet></router-outlet></main>
+  </div>
+  <button *ngIf="menuOpen" class="backdrop" type="button" (click)="closeMenu()" aria-label="Close navigation"></button>
 </div>

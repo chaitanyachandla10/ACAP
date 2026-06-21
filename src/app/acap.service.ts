@@ -1,7 +1,7 @@
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, Observable, of, retry, throwError } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface ManagerAllocation {
   noofManager: number;
@@ -21,57 +21,57 @@ export interface EmployeeRecord {
   name: string;
   title: string;
   department: string;
-  status: string;
+  status: 'Active' | 'On Leave' | 'Remote';
+  email?: string;
+  location?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+const DEMO_DEPARTMENTS: DepartmentRecord[] = [
+  { id: 1, departmentname: 'Product & Engineering', Managername: 'Priya Nair', manager: [{ noofManager: 2, developer: 18, tester: 6 }] },
+  { id: 2, departmentname: 'Customer Experience', Managername: 'Arjun Mehta', manager: [{ noofManager: 1, developer: 7, tester: 4 }] },
+  { id: 3, departmentname: 'People Operations', Managername: 'Neha Kapoor', manager: [{ noofManager: 1, developer: 4, tester: 2 }] }
+];
+
+const DEMO_EMPLOYEES: EmployeeRecord[] = [
+  { id: 1048, name: 'Aisha Sharma', title: 'Senior Product Designer', department: 'Product & Engineering', status: 'Active', email: 'aisha@acap.io', location: 'Bengaluru' },
+  { id: 1047, name: 'Rohan Patel', title: 'Frontend Engineer', department: 'Product & Engineering', status: 'Remote', email: 'rohan@acap.io', location: 'Pune' },
+  { id: 1046, name: 'Sana Verma', title: 'People Partner', department: 'People Operations', status: 'On Leave', email: 'sana@acap.io', location: 'Mumbai' },
+  { id: 1045, name: 'Kabir Singh', title: 'QA Lead', department: 'Product & Engineering', status: 'Active', email: 'kabir@acap.io', location: 'Hyderabad' },
+  { id: 1044, name: 'Mira Joshi', title: 'Customer Success Manager', department: 'Customer Experience', status: 'Active', email: 'mira@acap.io', location: 'Delhi' },
+  { id: 1043, name: 'Dev Malhotra', title: 'Platform Engineer', department: 'Product & Engineering', status: 'Remote', email: 'dev@acap.io', location: 'Chennai' }
+];
+
+@Injectable({ providedIn: 'root' })
 export class AcapService {
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = environment.apiUrl;
+  private readonly httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
-  constructor(private httpClient: HttpClient) { }
-
-  private readonly httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json'
-    })
-  };
+  constructor(private readonly httpClient: HttpClient) { }
 
   getDepartments(): Observable<DepartmentRecord[]> {
-    return this.httpClient.get<DepartmentRecord[]>(`${this.apiUrl}/getdata`).pipe(
-      catchError(() => of([]))
+    return this.httpClient.get<DepartmentRecord[]>(`${this.apiUrl}/departments`).pipe(
+      retry({ count: 1, delay: 300 }),
+      catchError(() => of(DEMO_DEPARTMENTS))
     );
   }
 
-  addDepartment(data: DepartmentRecord) {
+  addDepartment(data: DepartmentRecord): Observable<{ message: string; department: DepartmentRecord }> {
     return this.httpClient.post<{ message: string; department: DepartmentRecord }>(
-      `${this.apiUrl}/datasend`,
-      data,
-      this.httpOptions
-    );
+      `${this.apiUrl}/departments`, data, this.httpOptions
+    ).pipe(catchError((error: HttpErrorResponse) => throwError(() => error)));
   }
 
   getEmployees(): Observable<EmployeeRecord[]> {
-    const fallbackEmployees: EmployeeRecord[] = [
-      { id: 1, name: 'Aisha Sharma', title: 'Software Engineer', department: 'Development', status: 'Active' },
-      { id: 2, name: 'Rohan Patel', title: 'QA Analyst', department: 'Quality Assurance', status: 'Active' },
-      { id: 3, name: 'Sana Verma', title: 'HR Specialist', department: 'Human Resources', status: 'On Leave' }
-    ];
-
     return this.httpClient.get<EmployeeRecord[]>(`${this.apiUrl}/employees`).pipe(
-      catchError(() => of(fallbackEmployees))
+      retry({ count: 1, delay: 300 }),
+      catchError(() => of(DEMO_EMPLOYEES))
     );
   }
 
   getManagers(): Observable<ManagerAllocation[]> {
-    const fallbackManagers: ManagerAllocation[] = [
-      { noofManager: 2, developer: 12, tester: 5 },
-      { noofManager: 1, developer: 8, tester: 3 }
-    ];
-
     return this.httpClient.get<ManagerAllocation[]>(`${this.apiUrl}/managers`).pipe(
-      catchError(() => of(fallbackManagers))
+      retry({ count: 1, delay: 300 }),
+      catchError(() => of(DEMO_DEPARTMENTS.flatMap(department => department.manager)))
     );
   }
 }

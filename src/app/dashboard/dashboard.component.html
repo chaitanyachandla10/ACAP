@@ -1,39 +1,35 @@
-<div class="dashboard">
-  <h1>Dashboard</h1>
+<div class="page dashboard">
+  <header class="page-header">
+    <div><p class="eyebrow">Workforce intelligence</p><h1 class="page-title">Good morning, Chaitanya</h1><p class="page-subtitle">Here is what is happening across your organisation today.</p></div>
+    <a class="btn btn-primary" routerLink="/departments"><span>＋</span> Add department</a>
+  </header>
 
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-label">Departments</div>
-      <div class="summary-value">{{ departmentsCount }}</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Employees</div>
-      <div class="summary-value">{{ employeesCount }}</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Managers</div>
-      <div class="summary-value">{{ managersCount }}</div>
-    </div>
+  <div class="metric-grid" aria-label="Organisation summary">
+    <article class="metric-card"><div class="metric-head"><span class="metric-icon purple">◎</span><span class="trend up">↗ 12.5%</span></div><p>Total employees</p><strong>{{ employeesCount }}</strong><span class="metric-note">vs. last month</span></article>
+    <article class="metric-card"><div class="metric-head"><span class="metric-icon blue">◇</span><span class="trend up">↗ 4.2%</span></div><p>Departments</p><strong>{{ departmentsCount }}</strong><span class="metric-note">active business units</span></article>
+    <article class="metric-card"><div class="metric-head"><span class="metric-icon green">☆</span><span class="trend neutral">Stable</span></div><p>People managers</p><strong>{{ managersCount }}</strong><span class="metric-note">across all teams</span></article>
+    <article class="metric-card"><div class="metric-head"><span class="metric-icon orange">₹</span><span class="trend up">↗ 8.1%</span></div><p>Monthly allocation</p><strong>{{ totalBudget | currency:'USD':'symbol':'1.0-0' }}</strong><span class="metric-note">planned workforce cost</span></article>
   </div>
 
-  <p *ngIf="errorMessage" class="alert alert-warning">{{ errorMessage }}</p>
+  <p *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</p>
 
-  <section *ngIf="records.length; else emptyState">
-    <h2>Department allocations</h2>
-    <div *ngFor="let item of records" class="department-card">
-      <h3>{{ item.departmentname }}</h3>
-      <p><strong>Manager:</strong> {{ item.Managername }}</p>
-      <div *ngFor="let allocation of item.manager" class="allocation-row">
-        <div>Developers: {{ allocation.developer }}</div>
-        <div>Testers: {{ allocation.tester }}</div>
-        <div>Managers: {{ allocation.noofManager }}</div>
-        <div>Total cost: {{ getAllocationTotal(allocation) | currency:'USD':'symbol' }}</div>
-      </div>
-      <div class="department-total">Department total: {{ getDepartmentTotal(item) | currency:'USD':'symbol' }}</div>
-    </div>
+  <div class="dashboard-grid">
+    <section class="panel allocation-panel">
+      <div class="panel-header"><div><h2>Budget allocation</h2><p>Distribution by department</p></div><button class="more-button" aria-label="More options">•••</button></div>
+      <div class="budget-hero"><div class="donut"><span>{{ totalBudget | currency:'USD':'symbol':'1.0-0' }}</span><small>Total planned</small></div><div class="budget-legend"><div *ngFor="let item of records; index as i"><span class="legend-dot dot-{{ i % 3 }}"></span><div><strong>{{ item.departmentname }}</strong><small>{{ getBudgetPercent(item) }}% of allocation</small></div><b>{{ getDepartmentTotal(item) | currency:'USD':'symbol':'1.0-0' }}</b></div></div></div>
+    </section>
+
+    <section class="panel health-panel">
+      <div class="panel-header"><div><h2>Team health</h2><p>Current availability</p></div><span class="period">This month⌄</span></div>
+      <div class="health-number"><strong>{{ activeEmployees }}</strong><span>active now</span></div>
+      <div class="health-bars"><div><span style="width:78%" class="active-bar"></span></div><div><span style="width:22%" class="leave-bar"></span></div></div>
+      <div class="health-labels"><span><i class="active-dot"></i>Active <b>{{ activeEmployees }}</b></span><span><i class="leave-dot"></i>Flexible / leave <b>{{ employeesCount - activeEmployees }}</b></span></div>
+      <p class="health-callout">↗ Workforce availability is up 6% this month.</p>
+    </section>
+  </div>
+
+  <section class="panel people-panel">
+    <div class="panel-header"><div><h2>Recently active people</h2><p>Your latest workforce updates</p></div><a routerLink="/employees">View all →</a></div>
+    <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Role</th><th>Department</th><th>Status</th><th>Location</th></tr></thead><tbody><tr *ngFor="let employee of recentEmployees"><td><div class="person"><span class="person-avatar">{{ initials(employee.name) }}</span><div><strong>{{ employee.name }}</strong><small>{{ employee.email }}</small></div></div></td><td>{{ employee.title }}</td><td>{{ employee.department }}</td><td><span class="status" [class.status-active]="employee.status === 'Active'" [class.status-leave]="employee.status !== 'Active'">{{ employee.status }}</span></td><td>{{ employee.location }}</td></tr></tbody></table></div>
   </section>
-
-  <ng-template #emptyState>
-    <p>No department data available yet.</p>
-  </ng-template>
 </div>

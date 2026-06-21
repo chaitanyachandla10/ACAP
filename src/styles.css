@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --ink: #101828;
+  --muted: #667085;
+  --line: #e4e7ec;
+  --surface: #ffffff;
+  --canvas: #f6f7fb;
+  --brand: #6941c6;
+  --brand-dark: #53389e;
+  --brand-soft: #f4f3ff;
+  --success: #079455;
+  --warning: #dc6803;
+  --danger: #d92d20;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3 { font-family: "Manrope", sans-serif; letter-spacing: -.025em; }
+
+.page { max-width: 1440px; margin: 0 auto; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.eyebrow { margin-bottom: 7px; color: var(--brand); font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.page-title { margin-bottom: 7px; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; }
+.page-subtitle { max-width: 700px; margin-bottom: 0; color: var(--muted); line-height: 1.55; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border: 1px solid transparent; border-radius: 9px; cursor: pointer; font-weight: 600; text-decoration: none; transition: .18s ease; }
+.btn-primary { color: #fff; background: var(--brand); box-shadow: 0 1px 2px rgba(16,24,40,.12); }
+.btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); }
+.btn-secondary { color: #344054; background: #fff; border-color: #d0d5dd; }
+.btn-secondary:hover { background: #f9fafb; }
+.field-label { display: block; margin-bottom: 7px; color: #344054; font-size: 14px; font-weight: 600; }
+.field-control { width: 100%; min-height: 44px; padding: 10px 13px; color: var(--ink); background: #fff; border: 1px solid #d0d5dd; border-radius: 9px; outline: none; transition: .18s; }
+.field-control:focus { border-color: #9e77ed; box-shadow: 0 0 0 4px #f4ebff; }
+.field-control.invalid { border-color: #f04438; }
+.field-error { margin-top: 5px; color: var(--danger); font-size: 13px; }
+.status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.status::before { width: 6px; height: 6px; border-radius: 50%; background: currentColor; content: ""; }
+.status-active { color: #067647; background: #ecfdf3; }
+.status-leave { color: #b54708; background: #fffaeb; }
+.empty-state { padding: 46px 24px; color: var(--muted); text-align: center; }
+
+@media (max-width: 720px) {
+  .page-header { flex-direction: column; }
+  .page-header .btn { width: 100%; }
+}

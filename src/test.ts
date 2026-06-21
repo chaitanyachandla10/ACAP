@@ -5,17 +5,13 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-declare const require: {
-  context(path: string, deep?: boolean, filter?: RegExp): {
-    keys(): string[];
-    <T>(id: string): T;
-  };
-};
-
-// First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
-const context = require.context('./', true, /\.spec\.ts$/);
-context.keys().map(context);
+
+import './app/app.component.spec';
+import './app/acap.service.spec';
+import './app/dashboard/dashboard.component.spec';
+import './app/department/department.component.spec';
+import './app/manager/manager.component.spec';

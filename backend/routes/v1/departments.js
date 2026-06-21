@@ -1,91 +1,47 @@
 const express = require('express');
-const { createDepartment, getDepartments } = require('../../db');
+const { createDepartment, getDepartments, isDatabaseReady, normalizeManagerAllocations } = require('../../db');
+const demo = require('../../demo-data');
 const router = express.Router();
 
-/**
- * @swagger
- * tags:
- *   name: Departments
- *   description: Legacy department operations (v1)
- */
+function validateDepartment(req, res, next) {
+  const departmentname = String(req.body.departmentname || '').trim();
+  const managername = String(req.body.Managername ?? req.body.managername ?? '').trim();
+  const manager = normalizeManagerAllocations(req.body.manager);
+  const invalidAllocation = manager.some(item => [item.noofManager, item.developer, item.tester].some(value => value < 0 || value > 100));
 
-/**
- * @swagger
- * /api/v1/getdata:
- *   get:
- *     summary: Get all department records
- *     tags: [Departments]
- *     responses:
- *       200:
- *         description: List of departments
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/DepartmentRecord'
- *       500:
- *         description: Server error
- */
-router.get('/getdata', async (req, res) => {
-  try {
-    const departments = await getDepartments();
-    res.status(200).json(departments);
-  } catch (error) {
-    console.error('Failed to fetch departments', error);
-    res.status(500).json({ message: 'Unable to fetch department data' });
+  if (departmentname.length < 2 || managername.length < 2 || !manager.length || invalidAllocation) {
+    return res.status(400).json({ code: 'VALIDATION_ERROR', message: 'Provide valid department, lead and allocation values.' });
   }
-});
+  req.department = { departmentname: departmentname.slice(0, 120), managername: managername.slice(0, 120), manager };
+  next();
+}
 
-/**
- * @swagger
- * /api/v1/datasend:
- *   post:
- *     summary: Save department data
- *     tags: [Departments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DepartmentRecordInputV1'
- *     responses:
- *       201:
- *         description: Department created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 department:
- *                   $ref: '#/components/schemas/DepartmentRecord'
- *       400:
- *         description: Validation error
- *       500:
- *         description: Server error
- */
-router.post('/datasend', async (req, res) => {
+async function listDepartments(req, res, next) {
   try {
-    const departmentname = String(req.body.departmentname || '').trim();
-    const managername = String(req.body.Managername ?? req.body.managername ?? '').trim();
+    const departments = isDatabaseReady() ? await getDepartments() : demo.departments;
+    res.json(departments.length ? departments : demo.departments);
+  } catch (error) { next(error); }
+}
 
-    if (!departmentname || !managername) {
-      return res.status(400).json({ message: 'Department name and manager name are required' });
-    }
+router.get('/departments', listDepartments);
+router.get('/getdata', listDepartments);
 
-    const department = await createDepartment({
-      departmentname,
-      managername,
-      manager: req.body.manager
-    });
-
+router.post('/departments', validateDepartment, async (req, res, next) => {
+  try {
+    if (!isDatabaseReady()) return res.status(503).json({ code: 'DATABASE_UNAVAILABLE', message: 'Database is not available; no data was saved.' });
+    const department = await createDepartment(req.department);
     res.status(201).json({ message: 'Department saved successfully', department });
-  } catch (error) {
-    console.error('Failed to save department', error);
-    res.status(500).json({ message: 'Unable to save department' });
-  }
+  } catch (error) { next(error); }
 });
+router.post('/datasend', validateDepartment, async (req, res, next) => {
+  try {
+    if (!isDatabaseReady()) return res.status(503).json({ code: 'DATABASE_UNAVAILABLE', message: 'Database is not available; no data was saved.' });
+    const department = await createDepartment(req.department);
+    res.status(201).json({ message: 'Department saved successfully', department });
+  } catch (error) { next(error); }
+});
+
+router.get('/employees', (_req, res) => res.json(demo.employees));
+router.get('/managers', (_req, res) => res.json(demo.departments.flatMap(department => department.manager)));
 
 module.exports = router;

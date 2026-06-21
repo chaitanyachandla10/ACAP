@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ManagerComponent } from './manager.component';
+import { AcapService } from '../acap.service';
+import { of } from 'rxjs';
 
 describe('ManagerComponent', () => {
   let component: ManagerComponent;
@@ -8,7 +10,8 @@ describe('ManagerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ManagerComponent]
+      declarations: [ManagerComponent],
+      providers: [{ provide: AcapService, useValue: { getManagers: () => of([]) } }]
     })
     .compileComponents();
   }));

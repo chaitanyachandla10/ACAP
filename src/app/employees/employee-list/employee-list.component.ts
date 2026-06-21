@@ -1,31 +1,23 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AcapService } from '../../acap.service';
+import { Component, OnInit } from '@angular/core';
+import { AcapService, EmployeeRecord } from '../../acap.service';
 
-export interface EmployeeRecord {
-  id: number;
-  name: string;
-  title: string;
-  department: string;
-  status: string;
-}
-
-@Component({
-  selector: 'app-employee-list',
-  templateUrl: './employee-list.component.html',
-  styleUrls: ['./employee-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
+@Component({ selector: 'app-employee-list', standalone: false, templateUrl: './employee-list.component.html', styleUrls: ['./employee-list.component.css'] })
 export class EmployeeListComponent implements OnInit {
-  employees$: Observable<EmployeeRecord[]> = new Observable();
+  employees: EmployeeRecord[] = [];
+  filteredEmployees: EmployeeRecord[] = [];
+  query = '';
+  status = 'All';
+  loading = true;
 
-  constructor(private acapService: AcapService) { }
-
-  ngOnInit(): void {
-    this.employees$ = this.acapService.getEmployees();
+  constructor(private readonly acapService: AcapService) { }
+  ngOnInit(): void { this.acapService.getEmployees().subscribe(data => { this.employees = data; this.applyFilters(); this.loading = false; }); }
+  applyFilters(): void {
+    const term = this.query.trim().toLowerCase();
+    this.filteredEmployees = this.employees.filter(employee =>
+      (this.status === 'All' || employee.status === this.status) &&
+      (!term || `${employee.name} ${employee.title} ${employee.department}`.toLowerCase().includes(term))
+    );
   }
-
-  trackByEmployee(index: number, employee: EmployeeRecord): number {
-    return employee.id;
-  }
+  initials(name: string): string { return name.split(' ').map(part => part[0]).slice(0, 2).join(''); }
+  trackByEmployee(_: number, employee: EmployeeRecord): number { return employee.id; }
 }

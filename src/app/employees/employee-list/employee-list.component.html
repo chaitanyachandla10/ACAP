@@ -1,31 +1,9 @@
-<div class="container py-4">
-  <h2>Employee Service</h2>
-  <p>Employee listings are lazy-loaded and rendered using OnPush change detection.</p>
-
-  <div class="card p-3 mb-3" *ngIf="employees$ | async as employees; else loading">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Title</th>
-          <th>Department</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let employee of employees; trackBy: trackByEmployee">
-          <td>{{ employee.id }}</td>
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.title }}</td>
-          <td>{{ employee.department }}</td>
-          <td>{{ employee.status }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <ng-template #loading>
-    <div class="alert alert-info">Loading employees...</div>
-  </ng-template>
+<div class="page">
+  <header class="page-header"><div><p class="eyebrow">People directory</p><h1 class="page-title">Your people</h1><p class="page-subtitle">Find employees, understand team distribution and manage workforce availability.</p></div><button class="btn btn-primary"><span>＋</span> Add employee</button></header>
+  <section class="panel people-directory">
+    <div class="directory-head"><div class="title-count"><h2>All employees</h2><span>{{ filteredEmployees.length }}</span></div><div class="filters"><label class="filter-search"><span>⌕</span><input [(ngModel)]="query" (ngModelChange)="applyFilters()" type="search" placeholder="Search employees"></label><select [(ngModel)]="status" (ngModelChange)="applyFilters()" aria-label="Filter by status"><option>All</option><option>Active</option><option>Remote</option><option>On Leave</option></select></div></div>
+    <div class="table-wrap" *ngIf="!loading; else loadingState"><table><thead><tr><th>Employee</th><th>Employee ID</th><th>Role</th><th>Department</th><th>Status</th><th>Location</th><th></th></tr></thead><tbody><tr *ngFor="let employee of filteredEmployees; trackBy: trackByEmployee"><td><div class="person"><span class="avatar">{{ initials(employee.name) }}</span><div><strong>{{ employee.name }}</strong><small>{{ employee.email }}</small></div></div></td><td>#{{ employee.id }}</td><td>{{ employee.title }}</td><td>{{ employee.department }}</td><td><span class="status" [class.status-active]="employee.status === 'Active'" [class.status-leave]="employee.status !== 'Active'">{{ employee.status }}</span></td><td>{{ employee.location }}</td><td><button class="row-more" aria-label="Employee actions">•••</button></td></tr></tbody></table><div *ngIf="!filteredEmployees.length" class="empty-state">No employees match those filters.</div></div>
+    <ng-template #loadingState><div class="empty-state">Loading employee directory…</div></ng-template>
+    <div class="pagination"><span>Showing {{ filteredEmployees.length }} of {{ employees.length }} employees</span><div><button disabled>Previous</button><button class="current">1</button><button disabled>Next</button></div></div>
+  </section>
 </div>

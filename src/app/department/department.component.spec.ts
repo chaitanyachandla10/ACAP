@@ -17,7 +17,7 @@ describe('DepartmentComponent', () => {
         {
           provide: AcapService,
           useValue: {
-            addPerson: () => of({ message: 'ok', department: null })
+            addDepartment: () => of({ message: 'ok', department: null })
           }
         }
       ]
